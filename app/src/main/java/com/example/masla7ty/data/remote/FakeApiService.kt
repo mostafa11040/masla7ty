@@ -213,7 +213,7 @@ class FakeApiService : ApiService {
             nationalId = "9876543210",
             fullName = "محمد علي",
             email = "buyer@example.com",
-            phoneNumber = "966551234567",yhjntrkje6y
+            phoneNumber = "966551234567",
             userType = "BUYER",
             profileImageUrl = null,
             createdAt = now,
