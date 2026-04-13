@@ -6,16 +6,19 @@ import com.example.maslahty.data.local.AppDatabase
 import com.example.maslahty.data.local.dao.TransferRequestDao
 import com.example.maslahty.data.local.dao.UserDao
 import com.example.maslahty.data.local.dao.VehicleDao
+import com.example.maslahty.data.local.dao.ViolationDao
 import com.example.maslahty.data.remote.ApiService
 import com.example.maslahty.data.remote.FakeApiService
 import com.example.maslahty.data.repositories.AuthRepositoryImpl
 import com.example.maslahty.data.repositories.TransferRequestRepositoryImpl
 import com.example.maslahty.data.repositories.UserRepositoryImpl
 import com.example.maslahty.data.repositories.VehicleRepositoryImpl
+import com.example.maslahty.data.repositories.ViolationRepositoryImpl
 import com.example.maslahty.domain.repositories.AuthRepository
 import com.example.maslahty.domain.repositories.TransferRequestRepository
 import com.example.maslahty.domain.repositories.UserRepository
 import com.example.maslahty.domain.repositories.VehicleRepository
+import com.example.maslahty.domain.repositories.ViolationRepository
 import com.example.maslahty.domain.usecases.auth.RegisterUserUseCase
 import com.example.maslahty.domain.usecases.auth.SendOTPUseCase
 import com.example.maslahty.domain.usecases.auth.VerifyOTPUseCase
@@ -23,7 +26,10 @@ import com.example.maslahty.domain.usecases.transfer.ApproveTransferRequestUseCa
 import com.example.maslahty.domain.usecases.transfer.CreateTransferRequestUseCase
 import com.example.maslahty.domain.usecases.transfer.GetBuyerRequestsUseCase
 import com.example.maslahty.domain.usecases.vehicle.AddVehicleUseCase
+import com.example.maslahty.domain.usecases.vehicle.GetUserVehiclesUseCase
 import com.example.maslahty.domain.usecases.vehicle.GetVehicleByPlateUseCase
+import com.example.maslahty.domain.usecases.violation.CheckViolationsForTransferUseCase
+import com.example.maslahty.domain.usecases.violation.GetVehicleViolationsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -50,7 +56,7 @@ object AppModule {
             context,
             AppDatabase::class.java,
             AppDatabase.DATABASE_NAME
-        ).build()
+        ).fallbackToDestructiveMigration().build()
     }
 
     @Provides
@@ -64,6 +70,10 @@ object AppModule {
     @Provides
     @Singleton
     fun provideTransferRequestDao(database: AppDatabase): TransferRequestDao = database.transferRequestDao()
+
+    @Provides
+    @Singleton
+    fun provideViolationDao(database: AppDatabase): ViolationDao = database.violationDao()
 
     @Provides
     @Singleton
@@ -130,6 +140,15 @@ object AppModule {
         return TransferRequestRepositoryImpl(apiService, transferRequestDao)
     }
 
+    @Provides
+    @Singleton
+    fun provideViolationRepository(
+        apiService: ApiService,
+        violationDao: ViolationDao
+    ): ViolationRepository {
+        return ViolationRepositoryImpl(apiService, violationDao)
+    }
+
     // Use Cases
     @Provides
     @Singleton
@@ -163,6 +182,12 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideGetUserVehiclesUseCase(vehicleRepository: VehicleRepository): GetUserVehiclesUseCase {
+        return GetUserVehiclesUseCase(vehicleRepository)
+    }
+
+    @Provides
+    @Singleton
     fun provideCreateTransferRequestUseCase(transferRepository: TransferRequestRepository): CreateTransferRequestUseCase {
         return CreateTransferRequestUseCase(transferRepository)
     }
@@ -178,5 +203,18 @@ object AppModule {
     fun provideApproveTransferRequestUseCase(transferRepository: TransferRequestRepository): ApproveTransferRequestUseCase {
         return ApproveTransferRequestUseCase(transferRepository)
     }
+
+    @Provides
+    @Singleton
+    fun provideGetVehicleViolationsUseCase(violationRepository: ViolationRepository): GetVehicleViolationsUseCase {
+        return GetVehicleViolationsUseCase(violationRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCheckViolationsForTransferUseCase(violationRepository: ViolationRepository): CheckViolationsForTransferUseCase {
+        return CheckViolationsForTransferUseCase(violationRepository)
+    }
 }
+
 

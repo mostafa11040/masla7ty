@@ -6,6 +6,7 @@ import com.example.maslahty.data.models.OTPVerificationDto
 import com.example.maslahty.data.models.TransferRequestDto
 import com.example.maslahty.data.models.UserDto
 import com.example.maslahty.data.models.VehicleDto
+import com.example.maslahty.data.models.ViolationDto
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -25,7 +26,6 @@ interface ApiService {
 
     @POST("auth/register")
     suspend fun registerUser(@Body user: UserDto): UserDto
-
     // User Endpoints
     @GET("users/{id}")
     suspend fun getUser(@Path("id") id: String): UserDto
@@ -81,5 +81,12 @@ interface ApiService {
         @Path("id") id: String,
         @Body data: Map<String, String>
     ): Map<String, String>
+
+    // Violation Endpoints
+    @GET("violations/vehicle/{vehicleId}")
+    suspend fun getVehicleViolations(@Path("vehicleId") vehicleId: String): List<ViolationDto>
+
+    @GET("violations/{id}")
+    suspend fun getViolationById(@Path("id") id: String): ViolationDto
 }
 

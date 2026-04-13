@@ -7,6 +7,7 @@ import com.example.maslahty.data.models.PriceWarningDto
 import com.example.maslahty.data.models.TransferRequestDto
 import com.example.maslahty.data.models.UserDto
 import com.example.maslahty.data.models.VehicleDto
+import com.example.maslahty.data.models.ViolationDto
 import java.util.UUID
 import okhttp3.MultipartBody
 
@@ -20,6 +21,7 @@ class FakeApiService : ApiService {
     private val vehiclesById = linkedMapOf<String, VehicleDto>()
     private val vehiclesByPlate = linkedMapOf<String, VehicleDto>()
     private val requestsById = linkedMapOf<String, TransferRequestDto>()
+    private val violationsById = linkedMapOf<String, ViolationDto>()
     private val otpByPhone = linkedMapOf<String, String>()
 
     init {
@@ -175,6 +177,15 @@ class FakeApiService : ApiService {
         return mapOf("message" to "Transfer request rejected")
     }
 
+    // ── Violation Endpoints ─────────────────────────────
+    override suspend fun getVehicleViolations(vehicleId: String): List<ViolationDto> {
+        return violationsById.values.filter { it.vehicleId == vehicleId }
+    }
+
+    override suspend fun getViolationById(id: String): ViolationDto {
+        return violationsById[id] ?: throw IllegalArgumentException("المخالفة غير موجودة")
+    }
+
     private fun buildPriceWarning(price: Double): PriceWarningDto? {
         val marketPrice = 100000.0
         val difference = price - marketPrice
@@ -248,6 +259,96 @@ class FakeApiService : ApiService {
 
         vehiclesById[vehicle.id] = vehicle
         vehiclesByPlate[vehicle.licensePlate] = vehicle
+
+        // ── Second vehicle for the seller ─────────────────────
+        val vehicle2 = VehicleDto(
+            id = "vehicle2",
+            ownerId = seller.id,
+            licensePlate = "200XYZ5678",
+            chassisNumber = "WVWZZZ3CZWE123456",
+            engineNumber = "987654321CD",
+            model = "Hyundai Elantra",
+            manufacturingYear = 2022,
+            color = "White",
+            kilometers = 22000,
+            condition = "EXCELLENT",
+            licenseImageUrl = null,
+            vehicleImageUrl = null,
+            chassisImageUrl = null,
+            engineImageUrl = null,
+            createdAt = now,
+            updatedAt = now
+        )
+        vehiclesById[vehicle2.id] = vehicle2
+        vehiclesByPlate[vehicle2.licensePlate] = vehicle2
+
+        val vehicle3 = VehicleDto(
+            id = "vehicle3",
+            ownerId = seller.id,
+            licensePlate = "300DEF9012",
+            chassisNumber = "1HGCM82633A004352",
+            engineNumber = "456789123EF",
+            model = "Nissan Sunny",
+            manufacturingYear = 2018,
+            color = "Black",
+            kilometers = 78000,
+            condition = "GOOD",
+            licenseImageUrl = null,
+            vehicleImageUrl = null,
+            chassisImageUrl = null,
+            engineImageUrl = null,
+            createdAt = now,
+            updatedAt = now
+        )
+        vehiclesById[vehicle3.id] = vehicle3
+        vehiclesByPlate[vehicle3.licensePlate] = vehicle3
+
+        // ── Mock Violations ─────────────────────────────────
+        val violation1 = ViolationDto(
+            id = "viol_1",
+            vehicleId = "vehicle1",
+            violationType = "تجاوز السرعة",
+            description = "تجاوز السرعة المقررة بـ 40 كم/س على الطريق الدائري",
+            date = now - (30L * 24 * 60 * 60 * 1000), // 30 days ago
+            amount = 1500.0,
+            status = "UNPAID",
+            location = "الطريق الدائري - القاهرة"
+        )
+        val violation2 = ViolationDto(
+            id = "viol_2",
+            vehicleId = "vehicle1",
+            violationType = "مخالفة وقوف",
+            description = "وقوف في منطقة ممنوع فيها الانتظار",
+            date = now - (60L * 24 * 60 * 60 * 1000), // 60 days ago
+            amount = 500.0,
+            status = "PAID",
+            location = "شارع التحرير - وسط البلد"
+        )
+        val violation3 = ViolationDto(
+            id = "viol_3",
+            vehicleId = "vehicle1",
+            violationType = "قطع إشارة مرور",
+            description = "عدم الالتزام بالإشارة الحمراء عند التقاطع",
+            date = now - (15L * 24 * 60 * 60 * 1000), // 15 days ago
+            amount = 2000.0,
+            status = "UNPAID",
+            location = "ميدان رمسيس - القاهرة"
+        )
+        val violation4 = ViolationDto(
+            id = "viol_4",
+            vehicleId = "vehicle3",
+            violationType = "رخصة منتهية",
+            description = "قيادة السيارة برخصة منتهية الصلاحية",
+            date = now - (5L * 24 * 60 * 60 * 1000), // 5 days ago
+            amount = 1000.0,
+            status = "UNPAID",
+            location = "طريق المعادي - القاهرة"
+        )
+
+        violationsById[violation1.id] = violation1
+        violationsById[violation2.id] = violation2
+        violationsById[violation3.id] = violation3
+        violationsById[violation4.id] = violation4
     }
 }
 

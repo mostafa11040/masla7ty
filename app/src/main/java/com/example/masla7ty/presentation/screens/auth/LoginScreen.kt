@@ -205,8 +205,8 @@ fun LoginScreen(
                             onClick = {
                                 localError = null
                                 when {
-                                    nationalId.length < 10 ->
-                                        localError = "الرقم القومي يجب أن يكون على الأقل 10 أرقام"
+                                    nationalId.length < 14 ->
+                                        localError = "الرقم القومي يجب أن يكون على الأقل 14 أرقام"
                                     !ValidationUtil.isValidPhoneNumber(phoneNumber) ->
                                         localError = "رقم الهاتف غير صحيح"
                                     else -> viewModel.sendOTP(nationalId, phoneNumber)

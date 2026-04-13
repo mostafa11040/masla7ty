@@ -178,6 +178,17 @@ fun HomeScreen(navController: NavHostController) {
                     badgeText = "مشتري / بائع"
                 )
 
+                // Violations inquiry action
+                MainActionCard(
+                    title = "الاستعلام عن المخالفات",
+                    subtitle = "تحقق من المخالفات المرورية لمركباتك",
+                    icon = Icons.Default.GppBad,
+                    gradient = listOf(Color(0xFFDC2626), Color(0xFFEF4444)),
+                    textColor = Color.White,
+                    onClick = { navController.navigate(Screen.ViolationsMenuScreen.route) },
+                    badgeText = "خدمة جديدة"
+                )
+
                 Spacer(Modifier.height(8.dp))
 
                 // Info section

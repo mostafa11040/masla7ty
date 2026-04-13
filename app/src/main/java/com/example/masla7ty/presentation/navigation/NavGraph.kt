@@ -17,6 +17,8 @@ import com.example.maslahty.presentation.screens.transfer.RequestDetailsScreen
 import com.example.maslahty.presentation.screens.transfer.RequestsManagementScreen
 import com.example.maslahty.presentation.screens.transfer.TransferRequestScreen
 import com.example.maslahty.presentation.screens.transfer.VehicleDetailsScreen
+import com.example.maslahty.presentation.screens.violations.VehicleViolationsScreen
+import com.example.maslahty.presentation.screens.violations.ViolationsMenuScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -90,6 +92,18 @@ fun NavGraph(navController: NavHostController) {
         ) { backStackEntry ->
             val requestId = backStackEntry.arguments?.getString("requestId").orEmpty()
             RequestDetailsScreen(navController = navController, requestId = requestId)
+        }
+
+        composable(Screen.ViolationsMenuScreen.route) {
+            ViolationsMenuScreen(navController = navController)
+        }
+
+        composable(
+            route = Screen.VehicleViolationsScreen.route,
+            arguments = listOf(navArgument("vehicleId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val vehicleId = backStackEntry.arguments?.getString("vehicleId").orEmpty()
+            VehicleViolationsScreen(navController = navController, vehicleId = vehicleId)
         }
 
         // More screens will be added here
